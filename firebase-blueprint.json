@@ -1,0 +1,131 @@
+{
+  "entities": {
+    "StudentProgress": {
+      "title": "StudentProgress",
+      "description": "Student game session save state, progress, and inventory",
+      "type": "object",
+      "properties": {
+        "studentCode": {
+          "type": "string",
+          "description": "Student PIN or identification code",
+          "minLength": 2,
+          "maxLength": 32,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "studentName": {
+          "type": "string",
+          "description": "Display name or student nickname",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "stage": {
+          "type": "string",
+          "description": "Current story chapter or room in the facility",
+          "enum": ["LAB_CELL", "DARK_CORRIDOR", "BIO_REACTION_ZONE", "EXIT_VAULT", "ESCAPED", "GAME_OVER"]
+        },
+        "oxygen": {
+          "type": "number",
+          "description": "Current oxygen level percentage (0 to 100)"
+        },
+        "heartRate": {
+          "type": "number",
+          "description": "Current heart rate in beats per minute"
+        },
+        "monsterDistance": {
+          "type": "number",
+          "description": "Distance of the one-eyed cyclops monster in meters"
+        },
+        "elements": {
+          "type": "object",
+          "description": "Inventory count of elemental atoms"
+        },
+        "craftedCompounds": {
+          "type": "array",
+          "description": "List of successfully synthesized chemical molecules",
+          "maxLength": 30
+        },
+        "chemicalLog": {
+          "type": "array",
+          "description": "Recent chemical reaction logs",
+          "maxLength": 20
+        },
+        "wallIntegrity": {
+          "type": "number",
+          "description": "Integrity of exit blast wall (0 to 100)"
+        },
+        "monsterStunnedTime": {
+          "type": "number",
+          "description": "Seconds monster remains stunned by chemicals"
+        },
+        "monsterSlowedTime": {
+          "type": "number",
+          "description": "Seconds monster remains slowed by H2SO4 acid pool"
+        },
+        "monsterDistractedTime": {
+          "type": "number",
+          "description": "Seconds monster is confused by NH3 pungent odor"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp string of last save"
+        }
+      },
+      "required": ["studentCode", "studentName", "stage", "oxygen", "heartRate", "updatedAt"]
+    },
+    "LeaderboardEntry": {
+      "title": "LeaderboardEntry",
+      "description": "Public ranking record of a successful laboratory escape",
+      "type": "object",
+      "properties": {
+        "studentCode": {
+          "type": "string",
+          "description": "Student PIN or ID code",
+          "minLength": 2,
+          "maxLength": 32
+        },
+        "studentName": {
+          "type": "string",
+          "description": "Student name or agent callsign",
+          "minLength": 1,
+          "maxLength": 32
+        },
+        "escapeTimeSeconds": {
+          "type": "number",
+          "description": "Total seconds taken to escape the laboratory"
+        },
+        "remainingOxygen": {
+          "type": "number",
+          "description": "Oxygen percentage upon escape"
+        },
+        "synthesizedCount": {
+          "type": "number",
+          "description": "Number of chemical molecules synthesized"
+        },
+        "score": {
+          "type": "number",
+          "description": "Calculated tactical science score"
+        },
+        "compoundsUsed": {
+          "type": "array",
+          "description": "Key compounds deployed during escape",
+          "maxLength": 10
+        },
+        "escapedAt": {
+          "type": "string",
+          "description": "Date string when escape was completed"
+        }
+      },
+      "required": ["studentCode", "studentName", "escapeTimeSeconds", "remainingOxygen", "score", "escapedAt"]
+    }
+  },
+  "firestore": {
+    "/students/{studentCode}": {
+      "schema": "StudentProgress",
+      "description": "Individual student game session save state, keyed by their student code or PIN"
+    },
+    "/leaderboard/{entryId}": {
+      "schema": "LeaderboardEntry",
+      "description": "Global leaderboard entries for students who successfully escaped the underground laboratory"
+    }
+  }
+}

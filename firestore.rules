@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 2 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['studentCode', 'studentName', 'stage', 'oxygen', 'heartRate', 'updatedAt'])
+        && data.keys().hasOnly([
+          'studentCode', 'studentName', 'stage', 'oxygen', 'heartRate',
+          'monsterDistance', 'elements', 'craftedCompounds', 'chemicalLog',
+          'wallIntegrity', 'monsterStunnedTime', 'monsterSlowedTime', 'monsterDistractedTime',
+          'updatedAt'
+        ])
+        && data.studentCode is string && data.studentCode.size() >= 2 && data.studentCode.size() <= 32
+        && data.studentName is string && data.studentName.size() >= 1 && data.studentName.size() <= 32
+        && data.stage is string && data.stage.size() <= 32
+        && data.oxygen is number && data.oxygen >= 0 && data.oxygen <= 100
+        && data.heartRate is number && data.heartRate >= 30 && data.heartRate <= 250
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidLeaderboard(data) {
+      return data.keys().hasAll(['studentCode', 'studentName', 'escapeTimeSeconds', 'remainingOxygen', 'score', 'escapedAt'])
+        && data.keys().hasOnly([
+          'studentCode', 'studentName', 'escapeTimeSeconds', 'remainingOxygen',
+          'synthesizedCount', 'score', 'compoundsUsed', 'escapedAt'
+        ])
+        && data.studentCode is string && data.studentCode.size() >= 2 && data.studentCode.size() <= 32
+        && data.studentName is string && data.studentName.size() >= 1 && data.studentName.size() <= 32
+        && data.escapeTimeSeconds is number && data.escapeTimeSeconds >= 0 && data.escapeTimeSeconds <= 7200
+        && data.remainingOxygen is number && data.remainingOxygen >= 0 && data.remainingOxygen <= 100
+        && data.score is number && data.score >= 0
+        && data.escapedAt is string && data.escapedAt.size() <= 64;
+    }
+
+    match /students/{studentCode} {
+      allow get: if isValidId(studentCode);
+      allow list: if false; // Disallow querying all PINs to prevent student enumeration
+      allow create, update: if isValidId(studentCode) && isValidStudent(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /leaderboard/{entryId} {
+      allow read: if true;
+      allow create: if isValidId(entryId) && isValidLeaderboard(request.resource.data);
+      allow update, delete: if false;
+    }
+  }
+}

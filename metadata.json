@@ -1,0 +1,7 @@
+{
+  "name": "ChemEscape: 화학 결합 지하 연구소 탈출기",
+  "description": "원소 기호와 화학 결합(HCl, CH₄, NH₃, H₂SO₄ 등) 및 전술적 화학 반응을 활용해 어둠 속 외눈 거인을 피해 탈출하는 과학 생존 탈출 게임",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
